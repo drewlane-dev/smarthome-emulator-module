@@ -16,6 +16,13 @@ declare global {
     EJS_onGameStart?: () => void;
     EJS_onSaveState?: (data: { screenshot: string; state: ArrayBuffer }) => void;
     EJS_onLoadState?: () => ArrayBuffer | null;
+    EJS_emulator?: {
+      pause(): void;
+      exit(): void;
+      elements?: {
+        container?: HTMLElement;
+      };
+    };
   }
 }
 
@@ -39,6 +46,7 @@ export class EmulatorComponent implements OnInit, OnDestroy {
 
   currentRom: GameRom | null = null;
   isPlaying = false;
+  private currentRomUrl: string | null = null;
 
   systems = Object.entries(SYSTEM_INFO).map(([key, info]) => ({
     value: key,
@@ -176,12 +184,12 @@ export class EmulatorComponent implements OnInit, OnDestroy {
 
     // Create blob URL for the ROM
     const blob = new Blob([rom.data]);
-    const romUrl = URL.createObjectURL(blob);
+    this.currentRomUrl = URL.createObjectURL(blob);
 
     // Configure EmulatorJS
     window.EJS_player = '#emulator-game';
     window.EJS_core = systemInfo.core;
-    window.EJS_gameUrl = romUrl;
+    window.EJS_gameUrl = this.currentRomUrl;
     window.EJS_gameName = rom.name;
     window.EJS_color = '#9B59B6';
     window.EJS_startOnLoaded = true;
@@ -195,18 +203,48 @@ export class EmulatorComponent implements OnInit, OnDestroy {
   }
 
   stopEmulator(): void {
-    this.isPlaying = false;
-    this.currentRom = null;
+    // Try to properly exit the emulator
+    if (window.EJS_emulator) {
+      try {
+        window.EJS_emulator.pause();
+        window.EJS_emulator.exit();
+      } catch (e) {
+        console.warn('Error stopping emulator:', e);
+      }
+      delete window.EJS_emulator;
+    }
 
-    // Clean up EmulatorJS
+    // Revoke the blob URL
+    if (this.currentRomUrl) {
+      URL.revokeObjectURL(this.currentRomUrl);
+      this.currentRomUrl = null;
+    }
+
+    // Clean up EmulatorJS DOM elements
     const gameDiv = document.getElementById('emulator-game');
     if (gameDiv) {
       gameDiv.innerHTML = '';
     }
 
-    // Remove any added scripts
-    const scripts = document.querySelectorAll('script[src*="emulatorjs"]');
-    scripts.forEach(s => s.remove());
+    // Remove EmulatorJS container if it exists outside our div
+    const ejsContainer = document.querySelector('.ejs--container');
+    if (ejsContainer) {
+      ejsContainer.remove();
+    }
+
+    // Remove any added scripts and styles
+    document.querySelectorAll('script[src*="emulatorjs"]').forEach(s => s.remove());
+    document.querySelectorAll('link[href*="emulatorjs"]').forEach(s => s.remove());
+    document.querySelectorAll('style[data-ejs]').forEach(s => s.remove());
+
+    // Clear EJS global variables
+    delete window.EJS_player;
+    delete window.EJS_core;
+    delete window.EJS_gameUrl;
+    delete window.EJS_gameName;
+
+    this.isPlaying = false;
+    this.currentRom = null;
   }
 
   getSystemName(system: string): string {
