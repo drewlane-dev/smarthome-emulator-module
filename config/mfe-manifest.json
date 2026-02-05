@@ -1,10 +1,14 @@
 {
   "name": "emulator",
   "displayName": "Game Emulator",
+  "description": "Play classic retro games in your browser. Supports NES, SNES, Game Boy, and more.",
+  "remoteEntry": "/remoteEntry.json",
   "remoteName": "emulator",
   "exposedModule": "./Component",
-  "componentName": "EmulatorComponent",
-  "route": "emulator",
-  "icon": "sports_esports",
-  "color": "#9B59B6"
+  "componentExport": "EmulatorComponent",
+  "tile": {
+    "label": "Emulator",
+    "icon": "sports_esports",
+    "color": "#9B59B6"
+  }
 }
