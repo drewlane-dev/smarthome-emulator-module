@@ -18,6 +18,9 @@ RUN echo 'server { \
         root /usr/share/nginx/html; \
         index index.html; \
         try_files $uri $uri/ /index.html; \
+        add_header Access-Control-Allow-Origin *; \
+        add_header Access-Control-Allow-Methods "GET, OPTIONS"; \
+        add_header Access-Control-Allow-Headers "Origin, Content-Type, Accept"; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 
