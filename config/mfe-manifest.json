@@ -1,0 +1,10 @@
+{
+  "name": "emulator",
+  "displayName": "Game Emulator",
+  "remoteName": "emulator",
+  "exposedModule": "./Component",
+  "componentName": "EmulatorComponent",
+  "route": "emulator",
+  "icon": "sports_esports",
+  "color": "#9B59B6"
+}

@@ -1,0 +1,106 @@
+<div class="emulator-container">
+  @if (!isPlaying) {
+    <div class="library-view">
+      <div class="library-header">
+        <span class="material-icons header-icon">sports_esports</span>
+        <h2>Game Library</h2>
+      </div>
+
+      <div class="library-controls">
+        <div class="search-box">
+          <span class="material-icons">search</span>
+          <input
+            type="text"
+            placeholder="Search games..."
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearchChange()"
+          />
+        </div>
+
+        <select [(ngModel)]="selectedSystem" (ngModelChange)="onSystemChange()">
+          <option value="all">All Systems</option>
+          @for (system of systems; track system.value) {
+            <option [value]="system.value">{{ system.label }}</option>
+          }
+        </select>
+
+        <button class="upload-btn" (click)="openFileDialog()">
+          <span class="material-icons">add</span>
+          Add ROM
+        </button>
+        <input
+          #fileInput
+          type="file"
+          [accept]="getAcceptedExtensions()"
+          multiple
+          hidden
+          (change)="onFileSelected($event)"
+        />
+      </div>
+
+      @if (error) {
+        <div class="error-message">
+          <span class="material-icons">error</span>
+          {{ error }}
+        </div>
+      }
+
+      <div
+        class="games-grid"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        @if (loading) {
+          <div class="loading-state">
+            <span class="material-icons spinning">sync</span>
+            <p>Loading...</p>
+          </div>
+        } @else if (filteredRoms.length === 0) {
+          <div class="empty-state">
+            <span class="material-icons">cloud_upload</span>
+            <p>No games yet</p>
+            <p class="hint">Drag & drop ROM files here or click "Add ROM"</p>
+          </div>
+        } @else {
+          @for (rom of filteredRoms; track rom.id) {
+            <div class="game-card" (click)="playRom(rom)">
+              <div class="game-icon">
+                <span class="material-icons">{{ getSystemIcon(rom.system) }}</span>
+              </div>
+              <div class="game-info">
+                <span class="game-name">{{ rom.name }}</span>
+                <span class="game-system">{{ getSystemName(rom.system) }}</span>
+              </div>
+              <button class="delete-btn" (click)="deleteRom(rom, $event)">
+                <span class="material-icons">delete</span>
+              </button>
+            </div>
+          }
+        }
+
+        @if (isDragging) {
+          <div class="drop-overlay">
+            <span class="material-icons">cloud_upload</span>
+            <p>Drop ROM files here</p>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="player-view">
+      <div class="player-header">
+        <button class="back-btn" (click)="stopEmulator()">
+          <span class="material-icons">arrow_back</span>
+          Back to Library
+        </button>
+        <span class="now-playing">{{ currentRom?.name }}</span>
+      </div>
+
+      <div class="emulator-wrapper" #emulatorContainer>
+        <div id="emulator-game"></div>
+      </div>
+    </div>
+  }
+</div>

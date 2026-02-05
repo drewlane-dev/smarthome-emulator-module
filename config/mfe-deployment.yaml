@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emulator-mfe
+  namespace: smarthome
+  labels:
+    app: emulator-mfe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emulator-mfe
+  template:
+    metadata:
+      labels:
+        app: emulator-mfe
+    spec:
+      containers:
+        - name: emulator-mfe
+          image: emulator-mfe:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"
+            requests:
+              memory: "64Mi"
+              cpu: "50m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emulator-mfe
+  namespace: smarthome
+spec:
+  type: NodePort
+  selector:
+    app: emulator-mfe
+  ports:
+    - port: 80
+      targetPort: 80

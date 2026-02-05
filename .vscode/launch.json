@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Emulator UI",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "start",
+      "url": "http://localhost:4205",
+      "webRoot": "${workspaceFolder}/emulator-ui"
+    }
+  ]
+}
