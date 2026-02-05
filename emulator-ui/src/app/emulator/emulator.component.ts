@@ -5,14 +5,14 @@ import { RomStorageService, GameRom, SYSTEM_INFO, SystemType } from '../services
 
 declare global {
   interface Window {
-    EJS_player: string;
-    EJS_core: string;
-    EJS_gameUrl: string;
-    EJS_gameName: string;
-    EJS_color: string;
-    EJS_startOnLoaded: boolean;
-    EJS_pathtodata: string;
-    EJS_gameID: number;
+    EJS_player?: string;
+    EJS_core?: string;
+    EJS_gameUrl?: string;
+    EJS_gameName?: string;
+    EJS_color?: string;
+    EJS_startOnLoaded?: boolean;
+    EJS_pathtodata?: string;
+    EJS_gameID?: number;
     EJS_onGameStart?: () => void;
     EJS_onSaveState?: (data: { screenshot: string; state: ArrayBuffer }) => void;
     EJS_onLoadState?: () => ArrayBuffer | null;
